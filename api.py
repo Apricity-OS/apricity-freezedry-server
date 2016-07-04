@@ -41,7 +41,8 @@ class Build(Resource):
             args = parser.parse_args()
             print(args)
             with urllib.request.urlopen(args['furl']) as response:
-                toml = response.read()
+                toml = response.read().decode('utf-8')
+            print(toml)
             os.chdir(os.path.expanduser('~/apricity-build'))
             with open('freezedry/%s.toml' % args['fname'], 'w') as f:
                 f.write(toml)
