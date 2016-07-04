@@ -73,3 +73,8 @@ class Build(Resource):
                 running = None
                 return {'status': 'completed'}, 201
         return {'status': 'incompleted'}, 201
+
+api.add_resource(Build, '/build')
+
+if __name__ == '__main__':
+    app.run(debug=True)
