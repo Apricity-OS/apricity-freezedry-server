@@ -73,7 +73,7 @@ class Build(Resource):
             desturl = 'https://apricityos.com/freezedry-build/%s.iso' % \
                 running['oname']
             print('Looking for url response ...')
-            res = urllib.urlopen(desturl)
+            res = urllib.request.urlopen(desturl)
             print(res.getcode())
             if res.getcode() == 200:
                 running['process'].kill()
