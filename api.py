@@ -1,7 +1,6 @@
 from flask import Flask
 from flask_restful import Resource, Api, reqparse
-from urlparse import urlparse
-import urllib.request
+import urllib
 import http
 import subprocess
 import os
@@ -75,7 +74,7 @@ class Build(Resource):
             desturl = 'https://apricityos.com/freezedry-build/%s.iso' % \
                 running['oname']
             print('Looking for url response ...')
-            url = urlparse(desturl)
+            url = urllib.parse(desturl)
             conn = http.client.HTTPConnection(url.netloc)
             conn.request('HEAD', url.path)
             res = conn.getresponse()
