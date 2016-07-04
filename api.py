@@ -3,6 +3,7 @@ from flask_restful import Resource, Api, reqparse
 import urllib
 import http
 import subprocess
+import signal
 import os
 import time
 
@@ -25,11 +26,15 @@ running = None
 timeout = 7200
 
 
+def kill_build(running):
+    os.killpg(os.getpgid(running['process'].pid), signal.SIGTERM)
+
+
 def check_timeout():
     global running
     if running is not None:
         if time.time() - running['start'] > timeout:
-            running['process'].kill()
+            kill_build(running)
             running = None
             return 'terminated'
         return 'running'
@@ -57,7 +62,8 @@ class Build(Resource):
                 'fname': args['fname'],
                 'oname': args['oname'],
                 'start': time.time(),
-                'process': subprocess.Popen(cmd)
+                'process': subprocess.Popen(
+                    cmd, preexec_fn=os.setsid)
             }
             return {'status': 'success'}, 201
         return {'status': 'failure'}, 201
@@ -65,7 +71,7 @@ class Build(Resource):
     def delete(self):
         global running
         if running is not None:
-            running['process'].kill()
+            kill_build(running)
             running = None
             return {'status': 'success'}
         else:
@@ -88,7 +94,6 @@ class Build(Resource):
             conn.request('HEAD', url.path)
             res = conn.getresponse()
             if res.status == 200:
-                running['process'].kill()
                 running = None
                 return {'status': 'completed'}, 201
             else:
