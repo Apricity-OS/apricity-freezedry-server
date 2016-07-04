@@ -62,6 +62,15 @@ class Build(Resource):
             return {'status': 'success'}, 201
         return {'status': 'failure'}, 201
 
+    def delete(self):
+        global running
+        if running is not None:
+            running['process'].kill()
+            running = None
+            return {'status': 'success'}
+        else:
+            return {'status': 'nothing to kill'}
+
     def get(self):
         global running
         if running is not None:
@@ -74,7 +83,7 @@ class Build(Resource):
             desturl = 'https://apricityos.com/freezedry-build/%s.iso' % \
                 running['oname']
             print('Looking for url response ...')
-            url = urllib.parse(desturl)
+            url = urllib.parse.urlparse(desturl)
             conn = http.client.HTTPConnection(url.netloc)
             conn.request('HEAD', url.path)
             res = conn.getresponse()
