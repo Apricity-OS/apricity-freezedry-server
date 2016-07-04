@@ -46,7 +46,7 @@ class Build(Resource):
             os.chdir(os.path.expanduser('~/apricity-build'))
             with open('freezedry/%s.toml' % args['fname'], 'w') as f:
                 f.write(toml)
-            cmd = ['./buildpush.sh', '-v',
+            cmd = ['bash', 'buildpush.sh', '-v',
                    '-E', args['fname'],
                    '-R', 'true',
                    '-N', args['oname']]
