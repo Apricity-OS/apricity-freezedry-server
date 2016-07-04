@@ -1,7 +1,6 @@
 from flask import Flask
 from flask_restful import Resource, Api, reqparse
 import urllib.request
-import httplib.HTTPConnection
 import subprocess
 import os
 import time
@@ -65,13 +64,11 @@ class Build(Resource):
                 return {'status': 'terminated'}, 201
             elif timeout == 'no process':
                 return '', 501
-            desturl = '/freezedry-build/%s.iso' % \
+            desturl = 'https://apricityos.com/freezedry-build/%s.iso' % \
                 running['oname']
-            conn = httplib.HTTPConnection('apricityos.com')
-            conn.request(desturl)
-            res = conn.getresponse()
-            print(res.status)
-            if res.status == 200:
+            res = urllib.urlopen(desturl)
+            print(res.getcode())
+            if res.getcode() == 200:
                 running['process'].kill()
                 running = None
                 return {'status': 'completed'}, 201
