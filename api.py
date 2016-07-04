@@ -1,6 +1,8 @@
 from flask import Flask
 from flask_restful import Resource, Api, reqparse
+from urlparse import urlparse
 import urllib.request
+import http
 import subprocess
 import os
 import time
@@ -73,9 +75,11 @@ class Build(Resource):
             desturl = 'https://apricityos.com/freezedry-build/%s.iso' % \
                 running['oname']
             print('Looking for url response ...')
-            res = urllib.request.urlopen(desturl)
-            print(res.getcode())
-            if res.getcode() == 200:
+            url = urlparse(desturl)
+            conn = http.client.HTTPConnection(url.netloc)
+            conn.request('HEAD', url.path)
+            res = conn.getresponse()
+            if res.status == 200:
                 running['process'].kill()
                 running = None
                 return {'status': 'completed'}, 201
