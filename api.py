@@ -37,7 +37,9 @@ class Build(Resource):
     def put(self):
         global running
         if running is None:
+            print('Starting build ...')
             args = parser.parse_args()
+            print(args)
             with urllib.request.urlopen(args['furl']) as response:
                 toml = response.read()
             os.chdir(os.path.expanduser('~/apricity-build'))
@@ -59,6 +61,7 @@ class Build(Resource):
     def get(self):
         global running
         if running is not None:
+            print('Checking ...')
             timeout = check_timeout()
             if timeout == 'terminated':
                 return {'status': 'terminated'}, 201
@@ -66,6 +69,7 @@ class Build(Resource):
                 return '', 501
             desturl = 'https://apricityos.com/freezedry-build/%s.iso' % \
                 running['oname']
+            print('Looking for url response ...')
             res = urllib.urlopen(desturl)
             print(res.getcode())
             if res.getcode() == 200:
