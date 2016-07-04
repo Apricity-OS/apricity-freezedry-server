@@ -21,6 +21,8 @@ parser.add_argument('oname', type=str, help='name for output file')
 
 running = None
 
+timeout = 7200
+
 
 def check_timeout():
     global running
