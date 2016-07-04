@@ -43,7 +43,7 @@ class Build(Resource):
             with urllib.request.urlopen(args['furl']) as response:
                 toml = response.read()
             os.chdir(os.path.expanduser('~/apricity-build'))
-            with open('freezedry/%s' % args['fname'], 'w') as f:
+            with open('freezedry/%s.toml' % args['fname'], 'w') as f:
                 f.write(toml)
             cmd = ['./buildpush.sh', '-v',
                    '-E', args['fname'],
@@ -76,7 +76,10 @@ class Build(Resource):
                 running['process'].kill()
                 running = None
                 return {'status': 'completed'}, 201
-        return {'status': 'incompleted'}, 201
+            else:
+                return {'status': 'incompleted'}, 201
+        else:
+            return {'status': 'not running'}, 201
 
 api.add_resource(Build, '/build')
 
