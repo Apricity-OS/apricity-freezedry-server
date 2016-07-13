@@ -86,18 +86,24 @@ class Build(Resource):
                 return {'status': 'terminated'}, 201
             elif timeout == 'no process':
                 return '', 501
-            desturl = 'https://apricityos.com/freezedry-build/%s.iso' % \
-                running['oname']
-            print('Looking for url response ...')
-            url = urllib.parse.urlparse(desturl)
-            conn = http.client.HTTPConnection(url.netloc)
-            conn.request('HEAD', url.path)
-            res = conn.getresponse()
-            if res.status == 200:
-                running = None
-                return {'status': 'completed'}, 201
+            if running['process'].poll() == 0:  # built successfully
+                desturl = 'https://apricityos.com/freezedry-build/%s.iso' % \
+                    running['oname']
+                print('Looking for url response ...')
+                url = urllib.parse.urlparse(desturl)
+                conn = http.client.HTTPConnection(url.netloc)
+                conn.request('HEAD', url.path)
+                res = conn.getresponse()
+                if res.status == 200:
+                    running = None
+                    return {'status': 'completed'}, 201
+                else:
+                    return {'status': 'build/upload failed but exited 0'}, 201
+            elif running['process'].poll() is not None:
+                return{'status': 'build failed',
+                       'exitcode': running['process'].poll()}, 201
             else:
-                return {'status': 'incompleted'}, 201
+                return {'status': 'not completed'}, 201
         else:
             return {'status': 'not running'}, 201
 
