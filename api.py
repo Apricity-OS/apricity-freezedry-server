@@ -81,11 +81,6 @@ class Build(Resource):
         global running
         if running is not None:
             print('Checking ...')
-            timeout = check_timeout()
-            if timeout == 'terminated':
-                return {'status': 'terminated'}, 201
-            elif timeout == 'no process':
-                return '', 501
             if running['process'].poll() == 0:  # built successfully
                 desturl = 'https://apricityos.com/freezedry-build/%s.iso' % \
                     running['oname']
@@ -102,7 +97,12 @@ class Build(Resource):
             elif running['process'].poll() is not None:
                 return{'status': 'build failed',
                        'exitcode': running['process'].poll()}, 201
-            else:
+            else:  # only terminate if not completed
+                timeout = check_timeout()
+                if timeout == 'terminated':
+                    return {'status': 'terminated'}, 201
+                elif timeout == 'no process':
+                    return '', 501
                 return {'status': 'not completed'}, 201
         else:
             return {'status': 'not running'}, 201
