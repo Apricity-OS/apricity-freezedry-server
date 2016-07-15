@@ -45,7 +45,7 @@ class Build(Resource):
             # with urllib.request.urlopen(args['furl']) as response:
             #     toml = response.read().decode('utf-8')
             # print(toml)
-            # os.chdir(os.path.expanduser('~/apricity-build'))
+            os.chdir(os.path.expanduser('~/apricity-build'))
             with open('freezedry/gen.toml', 'w') as f:
                 f.write(args['config'])
             cmd = ['bash', 'buildpush.sh', '-v',
