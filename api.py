@@ -14,6 +14,7 @@ parser = reqparse.RequestParser()
 parser.add_argument('furl', type=str, help='url with freezedry toml config')
 parser.add_argument('fname', type=str, help='name of freezedry toml config')
 parser.add_argument('oname', type=str, help='name for output file')
+parser.add_argument('username', type=str, help='username')
 
 # running = {
 #     'fname': None,
@@ -57,6 +58,7 @@ class Build(Resource):
             cmd = ['bash', 'buildpush.sh', '-v',
                    '-E', args['fname'],
                    '-R', 'true',
+                   '-U', args['username'],
                    '-N', args['oname']]
             running = {
                 'fname': args['fname'],
@@ -66,16 +68,19 @@ class Build(Resource):
                     cmd, preexec_fn=os.setsid)
             }
             return {'status': 'success'}, 201
-        return {'status': 'failure'}, 201
+        return {'status': 'failure',
+                'message': 'something is already running'}, 201
 
     def delete(self):
         global running
         if running is not None:
             kill_build(running)
             running = None
-            return {'status': 'success'}
+            return {'status': 'success',
+                    'message': 'build killed'}, 201
         else:
-            return {'status': 'nothing to kill'}
+            return {'status': 'failure',
+                    'message': 'nothing to kill'}, 201
 
     def get(self):
         global running
@@ -83,9 +88,11 @@ class Build(Resource):
             print('Checking ...')
             timeout = check_timeout()
             if timeout == 'terminated':
-                return {'status': 'terminated'}, 201
+                return {'status': 'failure',
+                        'message': 'killed on timeout'}, 201
             elif timeout == 'no process':
-                return '', 501
+                return {'status': 'failure',
+                        'message': 'internal server error'}, 501
             desturl = 'https://apricityos.com/freezedry-build/%s.iso' % \
                 running['oname']
             print('Looking for url response ...')
@@ -95,11 +102,14 @@ class Build(Resource):
             res = conn.getresponse()
             if res.status == 200:
                 running = None
-                return {'status': 'completed'}, 201
+                return {'status': 'success',
+                        'message': 'build completed'}, 201
             else:
-                return {'status': 'incompleted'}, 201
+                return {'status': 'success',
+                        'message': 'build incomplete'}, 201
         else:
-            return {'status': 'not running'}, 201
+            return {'status': 'failure',
+                    'message': 'nothing running'}, 201
 
 api.add_resource(Build, '/build')
 
