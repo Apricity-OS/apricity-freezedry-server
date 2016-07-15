@@ -29,7 +29,6 @@ def check_timeout():
     if running is not None:
         if time.time() - running['start'] > timeout:
             kill_build(running)
-            running = None
             return 'terminated'
         return 'running'
     return 'no process'
@@ -86,11 +85,9 @@ class Build(Resource):
                 conn.request('HEAD', url.path)
                 res = conn.getresponse()
                 if res.status == 200:
-                    running = None
                     return {'status': 'success',
                             'message': 'build completed'}, 201
                 else:
-                    running = None
                     return {'status': 'failure',
                             'message': 'build/upload failed but exited 0'}, 201
             elif running['process'].poll() is not None:  # build failed
