@@ -77,7 +77,6 @@ class Build(Resource):
     def get(self):
         global running
         if running is not None:
-            print('Checking ...')
             if running['process'].poll() == 0:  # built successfully
                 desturl = 'https://apricityos.com/freezedry-build/%s.iso' % \
                     running['oname']
