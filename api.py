@@ -11,16 +11,9 @@ app = Flask(__name__)
 api = Api(app)
 
 parser = reqparse.RequestParser()
-parser.add_argument('furl', type=str, help='url with freezedry toml config')
-parser.add_argument('fname', type=str, help='name of freezedry toml config')
+parser.add_argument('config', type=str, help='plain toml text')
 parser.add_argument('oname', type=str, help='name for output file')
 parser.add_argument('username', type=str, help='username')
-
-# running = {
-#     'fname': None,
-#     'oname': None,
-#     'start': None,
-# }
 
 running = None
 
@@ -49,19 +42,18 @@ class Build(Resource):
             print('Starting build ...')
             args = parser.parse_args()
             print(args)
-            with urllib.request.urlopen(args['furl']) as response:
-                toml = response.read().decode('utf-8')
-            print(toml)
-            os.chdir(os.path.expanduser('~/apricity-build'))
-            with open('freezedry/%s.toml' % args['fname'], 'w') as f:
-                f.write(toml)
+            # with urllib.request.urlopen(args['furl']) as response:
+            #     toml = response.read().decode('utf-8')
+            # print(toml)
+            # os.chdir(os.path.expanduser('~/apricity-build'))
+            with open('freezedry/gen.toml', 'w') as f:
+                f.write(args['config'])
             cmd = ['bash', 'buildpush.sh', '-v',
-                   '-E', args['fname'],
                    '-R', 'true',
+                   '-E', 'gen',
                    '-U', args['username'],
                    '-N', args['oname']]
             running = {
-                'fname': args['fname'],
                 'oname': args['oname'],
                 'start': time.time(),
                 'process': subprocess.Popen(
