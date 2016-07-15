@@ -86,27 +86,34 @@ class Build(Resource):
         global running
         if running is not None:
             print('Checking ...')
-            timeout = check_timeout()
-            if timeout == 'terminated':
-                return {'status': 'failure',
-                        'message': 'killed on timeout'}, 201
-            elif timeout == 'no process':
-                return {'status': 'failure',
-                        'message': 'internal server error'}, 501
-            desturl = 'https://apricityos.com/freezedry-build/%s.iso' % \
-                running['oname']
-            print('Looking for url response ...')
-            url = urllib.parse.urlparse(desturl)
-            conn = http.client.HTTPConnection(url.netloc)
-            conn.request('HEAD', url.path)
-            res = conn.getresponse()
-            if res.status == 200:
-                running = None
-                return {'status': 'success',
-                        'message': 'build completed'}, 201
-            else:
-                return {'status': 'success',
-                        'message': 'build incomplete'}, 201
+            if running['process'].poll() == 0:  # built successfully
+                desturl = 'https://apricityos.com/freezedry-build/%s.iso' % \
+                    running['oname']
+                print('Looking for url response ...')
+                url = urllib.parse.urlparse(desturl)
+                conn = http.client.HTTPConnection(url.netloc)
+                conn.request('HEAD', url.path)
+                res = conn.getresponse()
+                if res.status == 200:
+                    running = None
+                    return {'status': 'success',
+                            'message': 'build completed'}, 201
+                else:
+                    return {'status': 'failure',
+                            'message': 'build/upload failed but exited 0'}, 201
+            elif running['process'].poll() is not None:  # build failed
+                return{'status': 'failure',
+                       'message': 'build failed with exitcode',
+                       'exitcode': running['process'].poll()}, 201
+            else:  # still running
+                timeout = check_timeout()
+                if timeout == 'terminated':
+                    return {'status': 'failure',
+                            'message': 'killed on timeout'}, 201
+                elif timeout == 'no process':
+                    return {'status': 'failure',
+                            'message': 'internal server error'}, 501
+                return {'status': 'not completed'}, 201
         else:
             return {'status': 'failure',
                     'message': 'nothing running'}, 201
