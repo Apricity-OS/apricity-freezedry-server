@@ -15,7 +15,7 @@ parser.add_argument('config', type=str, help='plain toml text')
 parser.add_argument('oname', type=str, help='name for output file')
 parser.add_argument('username', type=str, help='username')
 parser.add_argument(
-    'num', type=str,
+    'num', type=int,
     help='build number (unique for oname+username combination)')
 
 running = None
