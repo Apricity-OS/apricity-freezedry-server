@@ -68,7 +68,10 @@ class Build(Resource):
     def delete(self):
         global running
         if running is not None:
-            kill_build(running)
+            try:
+                kill_build(running)
+            except Exception as e:
+                print(e)
             running = None
             return {'status': 'success',
                     'message': 'build killed'}, 201
