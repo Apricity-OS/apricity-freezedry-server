@@ -91,6 +91,7 @@ class Build(Resource):
                     return {'status': 'success',
                             'message': 'build completed'}, 201
                 else:
+                    running = None
                     return {'status': 'failure',
                             'message': 'build/upload failed but exited 0'}, 201
             elif running['process'].poll() is not None:  # build failed
