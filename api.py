@@ -85,7 +85,7 @@ class Build(Resource):
         global running
         if running is not None:
             if running['process'].poll() == 0:  # built successfully
-                desturl = 'https://apricityos.com/freezedry-build/apricity_os-%s-%d.iso' % \
+                desturl = 'http://192.241.147.116/freezedry-build/apricity_os-%s-%d.iso' % \
                     (running['oname'], running['num'])
                 print('Looking for url response ...')
                 url = urllib.parse.urlparse(desturl)
