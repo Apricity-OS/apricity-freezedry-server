@@ -58,6 +58,7 @@ class Build(Resource):
             print(cmd)
             running = {
                 'oname': args['oname'],
+                'num': args['num'],
                 'start': time.time(),
                 'process': subprocess.Popen(
                     cmd, preexec_fn=os.setsid)
@@ -84,8 +85,8 @@ class Build(Resource):
         global running
         if running is not None:
             if running['process'].poll() == 0:  # built successfully
-                desturl = 'https://apricityos.com/freezedry-build/%s.iso' % \
-                    running['oname']
+                desturl = 'https://apricityos.com/freezedry-build/apricity_os-%s-%d.iso' % \
+                    (running['oname'], running['num'])
                 print('Looking for url response ...')
                 url = urllib.parse.urlparse(desturl)
                 conn = http.client.HTTPConnection(url.netloc)
