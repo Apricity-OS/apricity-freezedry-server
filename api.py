@@ -55,6 +55,7 @@ class Build(Resource):
                    '-E', 'gen',
                    '-U', args['username'],
                    '-N', '%s-%d' % (args['oname'], args['num'])]
+            print(cmd)
             running = {
                 'oname': args['oname'],
                 'start': time.time(),
