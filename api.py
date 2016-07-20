@@ -54,9 +54,11 @@ class Build(Resource):
                    '-R', 'true',
                    '-E', 'gen',
                    '-U', args['username'],
-                   '-N', '%s(%d)' % (args['oname'], args['num'])]
+                   '-N', '%s-%d' % (args['oname'], args['num'])]
             running_iso = {
                 'oname': args['oname'],
+                'num': args['num'],
+                'username': args['username'],
                 'start': time.time(),
                 'process': subprocess.Popen(
                     cmd, preexec_fn=os.setsid)
@@ -66,10 +68,13 @@ class Build(Resource):
                 'message': 'something is already running'}, 201
 
     def delete(self):
-        global running_iso
-        if running_iso is not None:
-            kill_iso_build(running_iso)
-            running_iso = None
+        global running
+        if running is not None:
+            try:
+                kill_iso_build(running)
+            except Exception as e:
+                print(e)
+            running = None
             return {'status': 'success',
                     'message': 'build killed'}, 201
         else:
@@ -77,11 +82,13 @@ class Build(Resource):
                     'message': 'nothing to kill'}, 201
 
     def get(self):
-        global running_iso
         if running_iso is not None:
             if running_iso['process'].poll() == 0:  # built successfully
-                desturl = 'https://apricityos.com/freezedry-build/%s.iso' % \
-                    running_iso['oname']
+                desturl = ('http://192.241.147.116/freezedry-build'
+                           '/%s/apricity_os-%s-%d.iso' %
+                           (running_iso['username'],
+                            running_iso['oname'],
+                            running_iso['num']))
                 print('Looking for url response ...')
                 url = urllib.parse.urlparse(desturl)
                 conn = http.client.HTTPConnection(url.netloc)
