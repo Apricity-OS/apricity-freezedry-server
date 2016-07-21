@@ -68,13 +68,13 @@ class Build(Resource):
                 'message': 'something is already running'}, 201
 
     def delete(self):
-        global running
-        if running is not None:
+        global running_iso
+        if running_iso is not None:
             try:
-                kill_iso_build(running)
+                kill_iso_build(running_iso)
             except Exception as e:
                 print(e)
-            running = None
+            running_iso = None
             return {'status': 'success',
                     'message': 'build killed'}, 201
         else:
