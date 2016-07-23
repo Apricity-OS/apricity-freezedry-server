@@ -151,15 +151,10 @@ class Repo(Resource):
     def put(self):
         global running_repo
         if running_repo is None:
-            print('Starting build ...')
+            print('Starting package ...')
             args = repo_parser.parse_args()
             print(args)
-            # with urllib.request.urlopen(args['furl']) as response:
-            #     toml = response.read().decode('utf-8')
-            # print(toml)
             os.chdir('/home/server/apricity-build')
-            with open('freezedry/gen.toml', 'w') as f:
-                f.write(args['config'])
             cmd = ['bash', 'buildpush.sh',
                    '-P', args['package_name'],
                    '-R', args['repo_name'],
