@@ -174,7 +174,10 @@ class Repo(Resource):
     def delete(self):
         global running_repo
         if running_repo is not None:
-            kill_repo_build(running_repo)
+            try:
+                kill_repo_build(running_repo)
+            except Exception as e:
+                print(e)
             running_repo = None
             return {'status': 'success',
                     'message': 'build killed'}, 201
