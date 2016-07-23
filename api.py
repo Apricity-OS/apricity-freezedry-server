@@ -154,7 +154,7 @@ class Repo(Resource):
             print('Starting package ...')
             args = repo_parser.parse_args()
             print(args)
-            os.chdir('/home/server/apricity-build')
+            os.chdir('/home/server/apricity-repo')
             cmd = ['bash', 'buildpush.sh',
                    '-P', args['package_name'],
                    '-R', args['repo_name'],
