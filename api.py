@@ -121,14 +121,15 @@ api.add_resource(Build, '/build')
 
 
 class SingleBuild(Resource):
-    def delete(self, url):
+    def delete(self, username, iso_name):
         os.chdir('/home/server/apricity-build')
         cmd = ['bash', 'deletebuild.sh',
-               '-U', url]
+               '-U', username,
+               '-N', iso_name]
         subprocess.call(cmd)
         return {'status': 'success'}, 201
 
-api.add_resource(SingleBuild, '/build/<string:url>')
+api.add_resource(SingleBuild, '/build/<string:username>/<string:iso_name>')
 
 repo_parser = reqparse.RequestParser()
 repo_parser.add_argument('package_name', type=str,
