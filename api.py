@@ -120,6 +120,16 @@ class Build(Resource):
 api.add_resource(Build, '/build')
 
 
+class SingleBuild(Resource):
+    def delete(self, url):
+        os.chdir('/home/server/apricity-build')
+        cmd = ['bash', 'deletebuild.sh',
+               '-U', url]
+        subprocess.call(cmd)
+        return {'status': 'success'}, 201
+
+api.add_resource(SingleBuild, '/build/<string:url>')
+
 repo_parser = reqparse.RequestParser()
 repo_parser.add_argument('package_name', type=str,
                          help='package name (i.e. google-chrome)')
