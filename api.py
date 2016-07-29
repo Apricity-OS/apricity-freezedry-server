@@ -161,15 +161,10 @@ class Repo(Resource):
     def put(self):
         global running_repo
         if running_repo is None:
-            print('Starting build ...')
+            print('Starting package ...')
             args = repo_parser.parse_args()
             print(args)
-            # with urllib.request.urlopen(args['furl']) as response:
-            #     toml = response.read().decode('utf-8')
-            # print(toml)
-            os.chdir('/home/server/apricity-build')
-            with open('freezedry/gen.toml', 'w') as f:
-                f.write(args['config'])
+            os.chdir('/home/server/apricity-repo')
             cmd = ['bash', 'buildpush.sh',
                    '-P', args['package_name'],
                    '-R', args['repo_name'],
@@ -189,7 +184,10 @@ class Repo(Resource):
     def delete(self):
         global running_repo
         if running_repo is not None:
-            kill_repo_build(running_repo)
+            try:
+                kill_repo_build(running_repo)
+            except Exception as e:
+                print(e)
             running_repo = None
             return {'status': 'success',
                     'message': 'build killed'}, 201
