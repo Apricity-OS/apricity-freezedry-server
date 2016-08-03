@@ -84,14 +84,14 @@ class Build(Resource):
     def get(self):
         if running_iso is not None:
             if running_iso['process'].poll() == 0:  # built successfully
-                desturl = ('http://192.241.147.116/freezedry-build'
+                desturl = ('https://static.apricityos.com/freezedry-build'
                            '/%s/apricity_os-%s-%d.iso' %
                            (running_iso['username'],
                             running_iso['oname'],
                             running_iso['num']))
                 print('Looking for url response ...')
                 url = urllib.parse.urlparse(desturl)
-                conn = http.client.HTTPConnection(url.netloc)
+                conn = http.client.HTTPSConnection(url.netloc)
                 conn.request('HEAD', url.path)
                 res = conn.getresponse()
                 if res.status == 200:
