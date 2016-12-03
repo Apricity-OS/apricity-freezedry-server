@@ -48,7 +48,7 @@ class Build(Resource):
             #     toml = response.read().decode('utf-8')
             # print(toml)
             os.chdir('/home/server/apricity-build')
-            with open('freezedry/gen.toml', 'w') as f:
+            with open('freezedry-x86_64/gen.toml', 'w') as f:
                 f.write(args['config'])
             cmd = ['bash', 'buildpush.sh', '-v',
                    '-R', 'true',
